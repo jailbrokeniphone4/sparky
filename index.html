@@ -1,79 +1,92 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Spark Explosion</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
   <style>
-    body {
+    html, body {
       margin: 0;
-      overflow: hidden;
+      padding: 0;
       background: #111;
-      color: white;
-      font-family: sans-serif;
-      position: relative;
+      overflow: hidden;
       cursor: crosshair;
+      font-family: sans-serif;
     }
-
-    .spark {
-      position: absolute;
-      width: 4px;
-      height: 4px;
-      background: yellow;
-      border-radius: 50%;
-      pointer-events: none;
-      animation: explode 0.6s ease-out forwards;
-    }
-
-    @keyframes explode {
-      to {
-        transform: translate(var(--x), var(--y));
-        opacity: 0;
-      }
-    }
-
-    #counter {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      font-size: 2em;
-      pointer-events: none;
-      user-select: none;
-      text-shadow: 0 0 10px yellow;
+    canvas {
+      display: block;
     }
   </style>
 </head>
 <body>
-  <div id="counter">Sparks: 0</div>
+<script>
+  let sparks = [];
+  let sparkCount = 0;
 
-  <script>
-    let sparkCount = 0;
-    const counter = document.getElementById('counter');
+  class Spark {
+    constructor(x, y) {
+      this.x = x;
+      this.y = y;
+      this.angle = random(0, TWO_PI);
+      this.speed = random(2, 6);
+      this.vx = cos(this.angle) * this.speed;
+      this.vy = sin(this.angle) * this.speed;
+      this.alpha = 255;
+      this.size = random(2, 4);
+      this.color = color(random(200, 255), random(200, 255), 0);
+    }
 
-    document.addEventListener('click', (e) => {
-      const numSparks = 150;
-      sparkCount += numSparks;
-      counter.textContent = `Sparks: ${sparkCount}`;
+    update() {
+      this.x += this.vx;
+      this.y += this.vy;
+      this.alpha -= 5;
+    }
 
-      for (let i = 0; i < numSparks; i++) {
-        const spark = document.createElement('div');
-        spark.className = 'spark';
+    show() {
+      noStroke();
+      fill(this.color.levels[0], this.color.levels[1], this.color.levels[2], this.alpha);
+      ellipse(this.x, this.y, this.size);
+    }
 
-        const angle = Math.random() * 2 * Math.PI;
-        const distance = 60 + Math.random() * 40;
-        const x = Math.cos(angle) * distance;
-        const y = Math.sin(angle) * distance;
+    isDead() {
+      return this.alpha <= 0;
+    }
+  }
 
-        spark.style.left = `${e.clientX}px`;
-        spark.style.top = `${e.clientY}px`;
-        spark.style.setProperty('--x', `${x}px`);
-        spark.style.setProperty('--y', `${y}px`);
+  function setup() {
+    createCanvas(windowWidth, windowHeight);
+    textAlign(CENTER, CENTER);
+    textSize(32);
+    fill(255);
+  }
 
-        document.body.appendChild(spark);
+  function draw() {
+    background(17);
 
-        setTimeout(() => spark.remove(), 600);
+    for (let i = sparks.length - 1; i >= 0; i--) {
+      sparks[i].update();
+      sparks[i].show();
+      if (sparks[i].isDead()) {
+        sparks.splice(i, 1);
       }
-    });
-  </script>
+    }
+
+    // Draw spark counter in center
+    fill(255, 255, 0);
+    text(`Sparks: ${sparkCount}`, width / 2, height / 2);
+  }
+
+  function mousePressed() {
+    const num = 150;
+    for (let i = 0; i < num; i++) {
+      sparks.push(new Spark(mouseX, mouseY));
+    }
+    sparkCount += num;
+  }
+
+  function windowResized() {
+    resizeCanvas(windowWidth, windowHeight);
+  }
+</script>
 </body>
 </html>
