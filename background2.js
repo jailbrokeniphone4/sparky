@@ -12,5 +12,5 @@ function draw() {
 
   // Optional: display spark count
   fill(255, 255, 0);
-  text(`Sparks: ${sparkCount}`, width / 2, height / 2);
+  text(`Sparks: ${sparkCount}`, width / 2, height / 5);
 }
