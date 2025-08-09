@@ -1,6 +1,6 @@
 function draw() {
   // Dark semi-transparent background for longer trails
-  background(17, 17, 17, 25); // Lower alpha = longer trails
+  background(20, 20, 20, 28); // Lower alpha = longer trails
 
   for (let i = sparks.length - 1; i >= 0; i--) {
     sparks[i].update();
